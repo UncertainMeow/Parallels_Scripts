@@ -1,0 +1,158 @@
+---
+#
+# Configure Excel Analytics VM
+# Sets up ODBC, Excel, directories, and development tools
+#
+
+- name: Configure Excel Analytics VM
+  hosts: windows_vms
+  gather_facts: yes
+
+  tasks:
+    - name: Display VM information
+      debug:
+        msg: |
+          Configuring: {{ inventory_hostname }}
+          OS: {{ ansible_os_family }}
+          IP: {{ ansible_host }}
+
+    # Ensure Chocolatey is installed
+    - name: Ensure Chocolatey is installed
+      win_chocolatey:
+        name: chocolatey
+        state: present
+      tags: [chocolatey]
+
+    # Install ODBC drivers
+    - name: Install PostgreSQL ODBC driver
+      win_package:
+        path: https://ftp.postgresql.org/pub/odbc/releases/REL-16_00_0000/psqlodbc_x64.msi
+        product_id: '{12345678-1234-1234-1234-123456789012}'  # Replace with actual product ID
+        state: present
+        arguments: /quiet /norestart ADDLOCAL=ALL
+      tags: [odbc, postgresql]
+      register: postgresql_install
+      failed_when: false  # Continue even if already installed
+
+    - name: Install MySQL ODBC driver
+      win_package:
+        path: https://dev.mysql.com/get/Downloads/Connector-ODBC/8.0/mysql-connector-odbc-8.0.35-winx64.msi
+        state: present
+        arguments: /quiet /norestart
+      tags: [odbc, mysql]
+      register: mysql_install
+      failed_when: false
+
+    # Configure ODBC DSNs
+    - name: Configure PostgreSQL ODBC DSN
+      community.windows.win_odbc_dsn:
+        name: "{{ database_connections.metabase.dsn_name }}"
+        driver: PostgreSQL Unicode(x64)
+        dsn_type: system
+        state: present
+        attribute_dict:
+          Server: "{{ database_connections.metabase.host }}"
+          Port: "{{ database_connections.metabase.port }}"
+          Database: "{{ database_connections.metabase.database }}"
+          UID: "{{ database_connections.metabase.username }}"
+      when: database_connections.metabase is defined
+      tags: [odbc, dsn, metabase]
+
+    - name: Configure MySQL ODBC DSN
+      community.windows.win_odbc_dsn:
+        name: "{{ database_connections.mysql_analytics.dsn_name }}"
+        driver: MySQL ODBC 8.0 Driver
+        dsn_type: system
+        state: present
+        attribute_dict:
+          Server: "{{ database_connections.mysql_analytics.host }}"
+          Port: "{{ database_connections.mysql_analytics.port }}"
+          Database: "{{ database_connections.mysql_analytics.database }}"
+          UID: "{{ database_connections.mysql_analytics.username }}"
+      when: database_connections.mysql_analytics is defined
+      tags: [odbc, dsn, mysql]
+
+    # Create directories
+    - name: Create Excel directories
+      win_file:
+        path: "{{ item }}"
+        state: directory
+      loop: "{{ excel_directories }}"
+      tags: [directories]
+
+    # Install development tools
+    - name: Install development tools via Chocolatey
+      win_chocolatey:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ dev_tools }}"
+      tags: [tools, chocolatey]
+
+    # Configure Windows settings
+    - name: Disable Windows hibernation
+      win_command: powercfg /hibernate off
+      tags: [windows_config]
+
+    - name: Set high performance power plan
+      win_command: powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
+      tags: [windows_config]
+
+    # Configure Windows Explorer
+    - name: Show hidden files
+      win_regedit:
+        path: HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced
+        name: Hidden
+        data: 1
+        type: dword
+      tags: [windows_config]
+
+    - name: Show file extensions
+      win_regedit:
+        path: HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced
+        name: HideFileExt
+        data: 0
+        type: dword
+      tags: [windows_config]
+
+    # Verify ODBC drivers
+    - name: List installed ODBC drivers
+      win_shell: Get-OdbcDriver | Select-Object Name | Format-Table -AutoSize
+      register: odbc_drivers
+      tags: [verify, odbc]
+
+    - name: Display installed ODBC drivers
+      debug:
+        msg: "{{ odbc_drivers.stdout_lines }}"
+      tags: [verify, odbc]
+
+    # Verify ODBC DSNs
+    - name: List configured ODBC DSNs
+      win_shell: Get-OdbcDsn | Select-Object Name, DriverName, DsnType | Format-Table -AutoSize
+      register: odbc_dsns
+      tags: [verify, odbc]
+
+    - name: Display configured ODBC DSNs
+      debug:
+        msg: "{{ odbc_dsns.stdout_lines }}"
+      tags: [verify, odbc]
+
+    # Final summary
+    - name: Configuration summary
+      debug:
+        msg: |
+          ✓ VM Configuration Complete!
+
+          Installed:
+          - ODBC drivers (PostgreSQL, MySQL)
+          - Development tools
+          - Excel directories created
+
+          Configured:
+          - ODBC DSNs
+          - Windows power settings
+          - Explorer settings
+
+          Next steps:
+          - Test ODBC connections from Excel
+          - Configure Excel macros
+          - Set up data refresh schedules

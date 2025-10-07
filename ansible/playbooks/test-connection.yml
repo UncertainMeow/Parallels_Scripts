@@ -1,0 +1,42 @@
+---
+#
+# Test Ansible connection to Parallels VMs
+# Use this to verify connectivity before running playbooks
+#
+
+- name: Test connection to Parallels VMs
+  hosts: all
+  gather_facts: no
+
+  tasks:
+    - name: Ping test (Windows)
+      win_ping:
+      when: ansible_os_family == "Windows" or ansible_connection == "winrm"
+
+    - name: Ping test (Linux)
+      ping:
+      when: ansible_os_family != "Windows" and ansible_connection != "winrm"
+
+    - name: Gather facts
+      setup:
+
+    - name: Display system information
+      debug:
+        msg: |
+          Host: {{ inventory_hostname }}
+          OS: {{ ansible_os_family }}
+          Distribution: {{ ansible_distribution | default('N/A') }}
+          Version: {{ ansible_distribution_version | default('N/A') }}
+          Architecture: {{ ansible_architecture }}
+          IP: {{ ansible_host }}
+
+    - name: Display connection details
+      debug:
+        msg: |
+          Connection: {{ ansible_connection }}
+          User: {{ ansible_user }}
+          {% if ansible_connection == 'winrm' %}
+          WinRM Port: {{ ansible_port }}
+          {% else %}
+          SSH Port: {{ ansible_port | default(22) }}
+          {% endif %}

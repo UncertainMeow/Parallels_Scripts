@@ -1,0 +1,35 @@
+#
+# Ansible inventory for Parallels VMs
+# Dynamically populated or manually configured
+#
+
+all:
+  children:
+    parallels_vms:
+      children:
+        windows_vms:
+          hosts:
+            windows_analytics:
+              ansible_host: "{{ lookup('pipe', 'prlctl list \"Windows-Analytics\" -o ip --no-header | tr -d \" \"') }}"
+              ansible_user: vagrant
+              ansible_password: vagrant
+              ansible_connection: winrm
+              ansible_winrm_transport: basic
+              ansible_winrm_server_cert_validation: ignore
+              ansible_port: 5985
+
+            # Add more Windows VMs here
+            # windows_test:
+            #   ansible_host: "{{ lookup('pipe', 'prlctl list \"Windows-Test\" -o ip --no-header | tr -d \" \"') }}"
+
+        linux_vms:
+          hosts:
+            # Example Linux VM
+            # ubuntu_dev:
+            #   ansible_host: "{{ lookup('pipe', 'prlctl list \"Ubuntu-Dev\" -o ip --no-header | tr -d \" \"') }}"
+            #   ansible_user: vagrant
+            #   ansible_ssh_private_key_file: ~/.ssh/id_rsa
+
+  vars:
+    # Global variables
+    ansible_python_interpreter: /usr/bin/python3

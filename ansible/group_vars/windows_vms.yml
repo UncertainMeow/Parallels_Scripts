@@ -1,0 +1,46 @@
+#
+# Group variables for Windows VMs
+#
+
+# WinRM connection settings
+ansible_connection: winrm
+ansible_winrm_transport: basic
+ansible_winrm_server_cert_validation: ignore
+ansible_port: 5985
+
+# Database connections (from config file)
+database_connections:
+  metabase:
+    type: postgresql
+    host: "{{ lookup('env', 'METABASE_HOST') | default('localhost') }}"
+    port: 5432
+    database: metabase
+    username: "{{ lookup('env', 'METABASE_USER') | default('analytics') }}"
+    dsn_name: "Metabase_Production"
+
+  mysql_analytics:
+    type: mysql
+    host: "{{ lookup('env', 'MYSQL_HOST') | default('localhost') }}"
+    port: 3306
+    database: analytics
+    username: "{{ lookup('env', 'MYSQL_USER') | default('analytics') }}"
+    dsn_name: "Analytics_MySQL"
+
+# Excel settings
+excel_directories:
+  - C:\Analytics
+  - C:\Analytics\Data
+  - C:\Analytics\Reports
+  - C:\Scripts
+
+# Development tools to install
+dev_tools:
+  - git
+  - python
+  - 7zip
+  - notepadplusplus
+  - dbeaver
+
+# Windows features to enable
+windows_features:
+  - TelnetClient  # For network testing
