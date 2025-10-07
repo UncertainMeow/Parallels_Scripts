@@ -1,0 +1,22 @@
+#
+# Example variables file for Windows golden image
+# Copy to variables.pkrvars.hcl and customize
+#
+
+# Path to Windows ISO
+iso_url = "~/Downloads/Win11_English_x64v1.iso"
+
+# ISO checksum (run: shasum -a 256 file.iso)
+# Can be "sha256:actual_checksum" or "file:path/to/checksum.txt"
+iso_checksum = "file:~/Downloads/Win11_English_x64v1.iso.sha256"
+
+# VM configuration
+vm_name   = "Windows-Analytics-Golden-2024-10"
+vm_memory = 8192  # 8GB RAM
+vm_cpus   = 4     # 4 CPU cores
+vm_disk_size = 65536  # 64GB disk
+
+# Credentials for provisioning
+# These are temporary and only used during build
+winrm_username = "vagrant"
+winrm_password = "vagrant"  # Change this!
