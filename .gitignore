@@ -1,0 +1,49 @@
+# Parallels VM files
+*.pvm/
+*.pvs/
+*.hdd/
+
+# Packer output
+packer_cache/
+output-*/
+*.box
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+
+# Ansible
+*.retry
+ansible/.vault_pass
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Secrets
+secrets/
+*.env
+*_credentials.json
+*.key
+*.pem
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp files
+*.log
+tmp/
+temp/
+*.tmp
+
+# ISOs (too large for git)
+*.iso
+
+# Backups
+*.bak
+backup/
