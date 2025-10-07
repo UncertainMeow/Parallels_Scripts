@@ -41,6 +41,9 @@ tmp/
 temp/
 *.tmp
 
+# Auto-commit logs (keep in .dev folder but don't commit)
+.dev/*.log
+
 # ISOs (too large for git)
 *.iso
 
