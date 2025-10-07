@@ -8,12 +8,15 @@ __author__ = "Kellen Malstrom"
 
 from .vm_manager import VMManager
 from .odbc_config import ODBCConfigurator
-from .excel_controller import ExcelController
+from .metabase import MetabaseClient, MetabaseAutomation
+from .config_loader import ConfigLoader
 from .logger import setup_logger
 
 __all__ = [
     "VMManager",
     "ODBCConfigurator",
-    "ExcelController",
+    "MetabaseClient",
+    "MetabaseAutomation",
+    "ConfigLoader",
     "setup_logger",
 ]

@@ -85,6 +85,35 @@ automation:
     recipients:
       - "your.email@company.com"
 
+# Metabase API Integration (optional)
+metabase:
+  base_url: "https://metabase.company.com"
+
+  # Option 1: API Key (recommended - more secure)
+  api_key: "${METABASE_API_KEY}"
+
+  # Option 2: Username + Password (if API key not available)
+  # username: "analytics@company.com"
+  # password: "${METABASE_PASSWORD}"
+
+  # Default export settings
+  export:
+    output_dir: "data/metabase_exports"
+    format: "csv"  # csv or excel
+    include_timestamp: true
+
+  # Scheduled exports
+  schedules:
+    daily_reports:
+      question_ids: [123, 456, 789]
+      cron: "0 8 * * 1-5"  # 8 AM weekdays
+      format: "excel"
+
+    hourly_metrics:
+      question_ids: [101, 102]
+      cron: "0 * * * *"  # Every hour
+      format: "csv"
+
 # Logging
 logging:
   level: "INFO"  # DEBUG, INFO, WARNING, ERROR
