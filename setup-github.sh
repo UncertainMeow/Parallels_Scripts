@@ -24,8 +24,8 @@ GITHUB_USER=${GITHUB_USER:-UncertainMeow}
 echo ""
 echo "Adding remote and pushing..."
 
-# Add remote
-git remote add origin "https://github.com/${GITHUB_USER}/Parallels_Scripts.git"
+# Add remote (using SSH - works with 1Password)
+git remote add origin "git@github.com:${GITHUB_USER}/Parallels_Scripts.git"
 
 # Push
 git push -u origin main
