@@ -24,12 +24,14 @@ __pycache__/
 .venv/
 venv/
 
-# Secrets
+# Secrets and Config Files
 secrets/
 *.env
 *_credentials.json
 *.key
 *.pem
+config/database-connections.yml
+config/*.local.yml
 
 # OS
 .DS_Store

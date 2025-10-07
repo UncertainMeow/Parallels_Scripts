@@ -1,0 +1,100 @@
+# Database Connection Configuration
+# Copy to database-connections.yml and fill in your values
+#
+# Security Note:
+# - Do NOT commit database-connections.yml (already in .gitignore)
+# - Use environment variables for passwords: ${ENV_VAR_NAME}
+# - Or use 1Password CLI: op://vault/item/field
+
+connections:
+  # Metabase PostgreSQL (primary analytics database)
+  metabase_prod:
+    type: postgresql
+    driver: "PostgreSQL Unicode(x64)"
+    host: "your-metabase-host.company.com"
+    port: 5432
+    database: "metabase"
+    username: "analytics_user"
+    # Option 1: Environment variable (recommended)
+    password: "${METABASE_PASSWORD}"
+    # Option 2: 1Password reference (if using op CLI)
+    # password: "op://Corporate/Metabase/password"
+    dsn_name: "Metabase_Production"
+    ssl_mode: "require"
+    description: "Production Metabase analytics database"
+
+  # Example: MySQL connection
+  analytics_mysql:
+    type: mysql
+    driver: "MySQL ODBC 8.0 Driver"
+    host: "mysql.company.com"
+    port: 3306
+    database: "analytics"
+    username: "analytics_ro"
+    password: "${MYSQL_PASSWORD}"
+    dsn_name: "Analytics_MySQL"
+    description: "Read-only analytics MySQL database"
+
+  # Example: SQL Server connection
+  warehouse_sqlserver:
+    type: sqlserver
+    driver: "ODBC Driver 18 for SQL Server"
+    host: "sqlserver.company.com"
+    port: 1433
+    database: "DataWarehouse"
+    username: "domain\\analytics_user"
+    password: "${SQLSERVER_PASSWORD}"
+    dsn_name: "DataWarehouse_SQLServer"
+    trust_server_certificate: true
+    description: "Corporate data warehouse"
+
+# Excel Integration Settings
+excel:
+  # Default query timeout (seconds)
+  query_timeout: 300
+
+  # Auto-refresh settings
+  auto_refresh:
+    enabled: true
+    interval_minutes: 60
+
+  # Power Query settings
+  power_query:
+    enable_background_refresh: true
+    enable_fast_data_load: true
+
+# Data Pull Automation
+automation:
+  # Schedule for automated data pulls
+  schedules:
+    - name: "morning_refresh"
+      cron: "0 8 * * 1-5"  # 8 AM weekdays
+      connections: ["metabase_prod"]
+      workbooks: ["Daily_Dashboard.xlsx"]
+
+    - name: "hourly_updates"
+      cron: "0 * * * *"  # Every hour
+      connections: ["metabase_prod"]
+      workbooks: ["Realtime_Metrics.xlsx"]
+
+  # Email notifications
+  notifications:
+    enabled: true
+    on_failure: true
+    on_success: false
+    recipients:
+      - "your.email@company.com"
+
+# Logging
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  file: "logs/excel-automation.log"
+  rotate:
+    max_size_mb: 100
+    keep_files: 10
+
+# VM Settings
+vm:
+  name: "Windows Analytics"
+  startup_wait_seconds: 45
+  shutdown_after_tasks: false
