@@ -1,0 +1,46 @@
+#
+# Example Terraform variables
+# Copy to terraform.tfvars and customize
+#
+
+vm_name         = "Windows-Analytics-Prod"
+base_image_name = "Windows-Analytics-Golden-2024-10"
+
+vm_cpus   = 4
+vm_memory = 8192  # 8 GB
+
+network_type = "shared"
+
+shared_folders = [
+  {
+    name = "analytics_data"
+    path = "~/Analytics/Data"
+  },
+  {
+    name = "analytics_reports"
+    path = "~/Analytics/Reports"
+  }
+]
+
+start_on_boot  = false
+create_test_vm = true
+
+# Optional: Create project-specific VMs
+project_vms = {
+  project_alpha = {
+    name          = "Analytics-ProjectAlpha"
+    description   = "Excel analytics for Project Alpha"
+    cpus          = 4
+    memory        = 8192
+    data_path     = "~/Projects/Alpha/Data"
+    start_on_boot = false
+  }
+  project_beta = {
+    name          = "Analytics-ProjectBeta"
+    description   = "Excel analytics for Project Beta"
+    cpus          = 2
+    memory        = 4096
+    data_path     = "~/Projects/Beta/Data"
+    start_on_boot = false
+  }
+}
